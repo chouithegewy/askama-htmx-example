@@ -1,0 +1,60 @@
+{% extends "_layout.html" %}
+
+{%- block title -%}Add a book{%- endblock -%}
+
+{%- block content -%}
+    <h1>Add a book</h1>
+
+    {#-
+        With htmx, the form is sent in the background (`hx-post`) and, if something needs
+        fixing, the server answers with just this block, errors filled in, which replaces the
+        form where it stands (`hx-target="this"`, `hx-swap="outerHTML"`). What was typed stays
+        put. When the book is saved, the server answers with an `HX-Location` header and htmx
+        goes to the new book's page.
+
+        Without JavaScript the same form posts normally and the server answers with this whole
+        page instead (status 422), or a redirect.
+    ~#}
+    {%- block form -%}
+    <form method="post" action="/books/new" class="book-form" novalidate
+          hx-post="/books/new" hx-target="this" hx-swap="outerHTML">
+        <label>
+            <span>Title</span>
+            <input type="text" name="title" value="{{ form.title }}" required
+                {%- if errors.title.is_some() %} aria-invalid="true" aria-describedby="title-error"{% endif %} />
+        </label>
+        {%- if let Some(error) = errors.title %}
+            <p class="error" id="title-error">{{ error }}</p>
+        {%- endif %}
+
+        <label>
+            <span>Author</span>
+            <input type="text" name="author" value="{{ form.author }}" required
+                {%- if errors.author.is_some() %} aria-invalid="true" aria-describedby="author-error"{% endif %} />
+        </label>
+        {%- if let Some(error) = errors.author %}
+            <p class="error" id="author-error">{{ error }}</p>
+        {%- endif %}
+
+        <label>
+            <span>Year</span>
+            <input type="text" name="year" value="{{ form.year }}" inputmode="numeric" required
+                {%- if errors.year.is_some() %} aria-invalid="true" aria-describedby="year-error"{% endif %} />
+        </label>
+        {%- if let Some(error) = errors.year %}
+            <p class="error" id="year-error">{{ error }}</p>
+        {%- endif %}
+
+        <label>
+            <span>Notes <span class="muted">(optional)</span></span>
+            <textarea name="notes" rows="4">{{ form.notes }}</textarea>
+        </label>
+
+        {#- `htmx-indicator` is shown only while the request is in flight. ~#}
+        <p>
+            <button type="submit">Add the book</button>
+            <span class="htmx-indicator muted">Saving…</span>
+        </p>
+    </form>
+    {%- endblock -%}
+{%- endblock -%}

@@ -1,0 +1,17 @@
+{% extends "_layout.html" %}
+
+{%- block title -%}About{%- endblock -%}
+
+{%- block content -%}
+    <h1>About</h1>
+    <p class="lead">An example of a server-rendered site in Rust.</p>
+    <ul>
+        <li><strong>actix-web</strong> answers the requests ("src/routes.rs").</li>
+        <li><strong>askama</strong> turns the templates in "templates/" into Rust when the
+            project compiles, so a typo in a template is a compile error, not a broken page.</li>
+        <li><strong>htmx</strong> fetches pages and parts of pages in the background, so the
+            site feels quick without a JavaScript framework. Every page still works without it.</li>
+    </ul>
+    <p>Things to try: follow a link and watch the network tab; search as you type; add a book
+        with a field left empty; remove a book from the list.</p>
+{%- endblock -%}

@@ -1,0 +1,24 @@
+{#-
+    Pieces of markup used on more than one page. A template brings them in with
+    `{% import "_macros.html" as m %}` and uses one with `{% call m::book_row(book) %}{% endcall %}`.
+-#}
+
+{#-
+    One book in a list, with a button that removes it.
+
+    The button's form names two ways to send it. With htmx, `hx-post` sends it in the
+    background and `hx-target`/`hx-swap` replace this row with the (empty) answer, removing
+    it; `hx-confirm` asks first. Without JavaScript the browser posts it as a normal form and
+    the server sends it back to the list.
+-#}
+{%- macro book_row(book) -%}
+    <li class="book-row">
+        <a href="{{ book.url() }}" class="book-title">{{ book.title }}</a>
+        <span class="muted">{{ book.author }}, {{ book.year }}</span>
+        <form method="post" action="{{ book.url() }}/delete"
+              hx-post="{{ book.url() }}/delete" hx-target="closest li" hx-swap="outerHTML"
+              hx-confirm="Remove “{{ book.title }}”?">
+            <button type="submit" class="link-button">Remove</button>
+        </form>
+    </li>
+{%- endmacro -%}

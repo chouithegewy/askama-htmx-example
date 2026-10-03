@@ -1,0 +1,24 @@
+{% extends "_layout.html" %}
+
+{%- block title -%}{{ book.title }}{%- endblock -%}
+{%- block description -%}{{ book.title }} by {{ book.author }} ({{ book.year }}).{%- endblock -%}
+
+{%- block content -%}
+    <p><a href="/books">← All books</a></p>
+    <h1>{{ book.title }}</h1>
+    <p class="lead">{{ book.author }}, {{ book.year }}</p>
+
+    {%- if !book.notes.is_empty() %}
+        {#- Escaped like everything else: askama escapes HTML in `.html` templates unless a
+            value is marked `|safe`. ~#}
+        <p>{{ book.notes }}</p>
+    {%- endif %}
+
+    {#-
+        A plain form, boosted like every other: htmx posts it, follows the server's redirect
+        to the list and shows that. `hx-confirm` asks first.
+    ~#}
+    <form method="post" action="{{ book.url() }}/delete" hx-confirm="Remove “{{ book.title }}”?">
+        <button type="submit" class="danger">Remove this book</button>
+    </form>
+{%- endblock -%}

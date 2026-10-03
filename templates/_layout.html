@@ -1,0 +1,54 @@
+{#-
+    The skeleton shared by every page.
+
+    A template that extends this one fills in the `title` and `content` blocks, and its struct
+    has a `current_path` field, which is what marks the current entry in the navigation.
+    Pages needing a stylesheet or script of their own fill in the `head` block.
+
+    `{#- … -#}` is an askama comment; the dashes trim the whitespace around it, so none of
+    these notes reach the browser.
+-#}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        {#- `crate::…` reaches any Rust item, here the constants in "src/nav.rs". ~#}
+        <title>{% block title %}{% endblock %} · {{ crate::nav::SITE }}</title>
+        <meta name="description" content="{% block description %}A small reading list, built with Rust, askama and htmx.{% endblock %}" />
+        <link rel="stylesheet" href="/static/style.css" />
+        {#-
+            htmx is a single file, vendored in "static/" so the site needs no CDN or build
+            step. `defer` runs it after the page is parsed.
+        ~#}
+        <script src="/static/htmx.min.js" defer></script>
+        {% block head %}{% endblock %}
+    </head>
+    {#-
+        `hx-boost` makes htmx take over every link and form below it: it fetches the target
+        page in the background and swaps in its `<body>` instead of reloading the document.
+        The address bar and history stay in step, so pages remain ordinary addresses that also
+        work with JavaScript off.
+    ~#}
+    <body hx-boost="true">
+        <a href="#main" class="skip">Skip to content</a>
+
+        <header class="site-header">
+            <a href="/" class="site-name">{{ crate::nav::SITE }}</a>
+            <nav aria-label="Main">
+                {%- for link in crate::nav::NAV %}
+                    <a href="{{ link.path }}"
+                        {%- if link.path == current_path %} aria-current="page"{% endif %}>{{ link.label }}</a>
+                {%- endfor %}
+            </nav>
+        </header>
+
+        <main id="main">
+            {%~ block content %}{% endblock ~%}
+        </main>
+
+        <footer class="site-footer">
+            <p>Built with <a href="https://actix.rs">actix-web</a>, <a href="https://askama.rs">askama</a> and <a href="https://htmx.org">htmx</a>.</p>
+        </footer>
+    </body>
+</html>

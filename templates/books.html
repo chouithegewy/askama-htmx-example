@@ -1,0 +1,39 @@
+{% extends "_layout.html" %}
+{% import "_macros.html" as m %}
+
+{%- block title -%}Books{%- endblock -%}
+
+{%- block content -%}
+    <h1>Books</h1>
+
+    {#-
+        A search that works as a plain GET form, and also as you type. The `hx-*` attributes
+        send it 300 ms after the last keystroke, put the answer in `#results`, and update the
+        address bar (so the search can be bookmarked or shared). htmx tells the server the
+        target is `results`, and the server answers with only that block; see `list_books` in
+        "src/routes.rs".
+    ~#}
+    <form action="/books" method="get" role="search" class="search"
+          hx-get="/books" hx-target="#results" hx-push-url="true"
+          hx-trigger="input changed delay:300ms from:input, search from:input, submit">
+        <label for="q">Search by title or author</label>
+        <input type="search" id="q" name="q" value="{{ query }}" autocomplete="off" />
+        <button type="submit">Search</button>
+    </form>
+
+    <div id="results" aria-live="polite">
+        {%- block results -%}
+            {%- if books.is_empty() %}
+                <p class="muted">
+                    {%- if query.is_empty() %}No books yet.{% else %}Nothing matches “{{ query }}”.{% endif -%}
+                </p>
+            {%- else %}
+                <ul class="book-list">
+                    {%- for book in books %}
+                        {% call m::book_row(book) %}{% endcall %}
+                    {%- endfor %}
+                </ul>
+            {%- endif %}
+        {%- endblock -%}
+    </div>
+{%- endblock -%}

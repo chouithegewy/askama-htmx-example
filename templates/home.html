@@ -1,0 +1,21 @@
+{% extends "_layout.html" %}
+{% import "_macros.html" as m %}
+
+{%- block title -%}Home{%- endblock -%}
+
+{%- block content -%}
+    <h1>{{ crate::nav::SITE }}</h1>
+    <p class="lead">
+        {{ count }} book{% if count != 1 %}s{% endif %} so far.
+        <a href="/books">See them all</a> or <a href="/books/new">add one</a>.
+    </p>
+
+    {%- if !recent.is_empty() %}
+        <h2>Added most recently</h2>
+        <ul class="book-list">
+            {%- for book in recent %}
+                {% call m::book_row(book) %}{% endcall %}
+            {%- endfor %}
+        </ul>
+    {%- endif %}
+{%- endblock -%}
